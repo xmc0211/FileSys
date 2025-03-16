@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2025 xmc0211
+// Copyright (c) 2025 FileSys - xmc0211 <xmc0211@qq.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,72 +27,77 @@
 #include <string>
 #include "FileBinIO.h"
 
-// 文件操作枚举
+#if defined(UNICODE)
+#define _tstring wstring
+#else
+#define _tstring string
+#endif
+
+// Enumeration of file operations
 enum FSFILEACTION {
-	FS_OPEN,			// 用默认方式打开
-	FS_PRINT,			// 打印（仅限文档）
-	FS_EDIT,			// 用默认编辑器编辑（如果有）
-	FS_EXPLORE,			// 用文件资源管理器打开
-//	FS_FIND,			// 搜索（仅限文档） // 暂不提供此功能
-	FS_PROPERTIES,		// 打开属性对话框
-	FS_RUNASADMIN,		// 用管理员身份运行（仅限可执行文件）
+	FS_OPEN,			// Open in default mode
+	FS_PRINT,			// Printing (document only)
+	FS_EDIT,			// Edit with default editor (if available)
+	FS_EXPLORE,			// Open with File Explorer
+//	FS_FIND,			// Search (document only) // This feature is not currently available
+	FS_PROPERTIES,		// Open the Properties dialog box
+	FS_RUNASADMIN,		// Run as administrator (executable files only)
 };
 
-// 添加或去除文件属性
+// Add or remove file attributes
 #define FSAddObjectAttribute(f, a) FSSetObjectAttribute((f), FSGetObjectAttribute((f)) | (a))
 #define FSRemoveObjectAttribute(f, a) FSSetObjectAttribute((f), FSGetObjectAttribute((f)) & ~(a))
 
-// 路径回调函数。返回TRUE继续枚举，返回FALSE停止枚举。
-typedef BOOL(CALLBACK* FS_PATH_CALLBACK)(std::string ExistFullPath, LPVOID lpParam);
+// Path callback function. Return TRUE to continue enumeration, return False to stop enumeration.
+typedef BOOL(CALLBACK* FS_PATH_CALLBACK)(std::_tstring ExistFullPath, LPVOID lpParam);
 
-// 判断文件或目录是否存在
-BOOL FSObjectExist(_In_ LPCSTR lpFullPath);
-// 查看文件或目录属性
-DWORD FSGetObjectAttribute(_In_ LPCSTR lpExistFullPath);
-// 设置文件或目录属性
-BOOL FSSetObjectAttribute(_In_ LPCSTR lpExistFullPath, _In_opt_ UINT uFileAttribute);
-// 对文件执行操作
-// 可用操作可以参考枚举内注释。
-HANDLE FSOpenObject(_In_ LPCSTR lpExistFullPath, _In_opt_ FSFILEACTION fAction = FS_OPEN, _In_opt_ LPCSTR lpParameters = NULL, _In_opt_ BOOL bWaitForThread = TRUE, _In_opt_ UINT uShowFlags = SW_SHOWNORMAL);
-// 判断路径是否为文件。若不存在则返回FALSE，若都存在则返回bDefault。
-BOOL FSObjectIsFile(_In_ LPCSTR lpFullPath);
+// Determine whether the file or directory exists
+BOOL FSObjectExist(_In_ std::_tstring lpFullPath);
+// View file or directory properties
+DWORD FSGetObjectAttribute(_In_ std::_tstring lpExistFullPath);
+// Set file or directory properties
+BOOL FSSetObjectAttribute(_In_ std::_tstring lpExistFullPath, _In_opt_ UINT uFileAttribute);
+// Perform operations on files. The available operations can refer to the comments within the enumeration.
+HANDLE FSOpenObject(_In_ std::_tstring lpExistFullPath, _In_opt_ FSFILEACTION fAction = FS_OPEN, _In_opt_ std::_tstring lpParameters = NULL, _In_opt_ BOOL bWaitForThread = TRUE, _In_opt_ UINT uShowFlags = SW_SHOWNORMAL);
+// Determine whether the path is a file. If it does not exist, return False; if both exist, return bDefault.
+BOOL FSObjectIsFile(_In_ std::_tstring lpFullPath);
 
-// 获取当前文件名
-std::string FSGetCurrentFilePath();
+// Get the current file name
+std::_tstring FSGetCurrentFilePath();
 
-// 格式化完整路径
-std::string FSFormat(_In_ LPCSTR lpFormat, _In_ LPCSTR lpFullPath);
+// Format the complete path (lpFormat example: dpnx=>C:\Windows\System32\CMD.EXE nx=>CMD.EXE)
+std::_tstring FSFormat(_In_ std::_tstring lpFormat, _In_ std::_tstring lpFullPath);
 
-// 创建空文件
-BOOL FSCreateFile(_In_ LPCSTR lpFullPath);
-// 删除文件
-BOOL FSDeleteFile(_In_ LPCSTR lpExistFullPath);
-// 移动文件
-BOOL FSMoveFile(_In_ LPCSTR lpExistFullPath, _In_ LPCSTR lpNewFullPath, _In_opt_ BOOL bFailIfExists = TRUE);
-// 重命名文件
-BOOL FSRenameFile(_In_ LPCSTR lpExistFullPath, _In_ LPCSTR lpNewFileName, _In_opt_ BOOL bFailIfExists = TRUE);
-// 复制文件
-BOOL FSCopyFile(_In_ LPCSTR lpExistFullPath, _In_ LPCSTR lpNewFullPath, _In_opt_ BOOL bFailIfExists = TRUE);
+// Create an empty file
+BOOL FSCreateFile(_In_ std::_tstring lpFullPath);
+// Delete file
+BOOL FSDeleteFile(_In_ std::_tstring lpExistFullPath);
+// Move file
+BOOL FSMoveFile(_In_ std::_tstring lpExistFullPath, _In_ std::_tstring lpNewFullPath, _In_opt_ BOOL bFailIfExists = TRUE);
+// Rename file
+BOOL FSRenameFile(_In_ std::_tstring lpExistFullPath, _In_ std::_tstring lpNewFileName, _In_opt_ BOOL bFailIfExists = TRUE);
+// Copy file
+BOOL FSCopyFile(_In_ std::_tstring lpExistFullPath, _In_ std::_tstring lpNewFullPath, _In_opt_ BOOL bFailIfExists = TRUE);
 
-// 创建空目录
-BOOL FSCreateDir(_In_ LPCSTR lpFullPath);
-// 删除目录
-BOOL FSDeleteDir(_In_ LPCSTR lpFullPath);
-// 移动目录
-BOOL FSMoveDir(_In_ LPCSTR lpExistFullPath, _In_ LPCSTR lpNewFullPath, _In_opt_ BOOL bFailIfExists = TRUE);
-// 重命名目录
-BOOL FSRenameDir(_In_ LPCSTR lpExistFullPath, _In_ LPCSTR lpNewFileName, _In_opt_ BOOL bFailIfExists = TRUE);
-// 复制目录
-BOOL FSCopyDir(_In_ LPCSTR lpExistFullPath, _In_ LPCSTR lpNewFullPath, _In_opt_ BOOL bFailIfExists = TRUE);
+// Create an empty directory
+BOOL FSCreateDir(_In_ std::_tstring lpFullPath);
+// Delete directory
+BOOL FSDeleteDir(_In_ std::_tstring lpFullPath);
+// Move directory
+BOOL FSMoveDir(_In_ std::_tstring lpExistFullPath, _In_ std::_tstring lpNewFullPath, _In_opt_ BOOL bFailIfExists = TRUE);
+// Rename directory
+BOOL FSRenameDir(_In_ std::_tstring lpExistFullPath, _In_ std::_tstring lpNewFileName, _In_opt_ BOOL bFailIfExists = TRUE);
+// Copy directory
+BOOL FSCopyDir(_In_ std::_tstring lpExistFullPath, _In_ std::_tstring lpNewFullPath, _In_opt_ BOOL bFailIfExists = TRUE);
 
-// 枚举目录下一级子目录
-BOOL FSEnumDir(_In_ LPCSTR lpExistDirPath, _In_ FS_PATH_CALLBACK cbFunc, _In_opt_ LPVOID lpParam);
-// 枚举目录下一级子文件
-BOOL FSEnumFile(_In_ LPCSTR lpExistDirPath, _In_ FS_PATH_CALLBACK cbFunc, _In_opt_ LPVOID lpParam);
-// 枚举目录下所有子目录
-BOOL FSEnumAllDir(_In_ LPCSTR lpExistDirPath, _In_ FS_PATH_CALLBACK cbFunc, _In_opt_ LPVOID lpParam);
-// 枚举目录下所有子文件
-BOOL FSEnumAllFile(_In_ LPCSTR lpExistDirPath, _In_ FS_PATH_CALLBACK cbFunc, _In_opt_ LPVOID lpParam);
+// List the subdirectories under the directory
+BOOL FSEnumDir(_In_ std::_tstring lpExistDirPath, _In_ FS_PATH_CALLBACK cbFunc, _In_opt_ LPVOID lpParam);
+// List the sub files of the directory at the next level
+BOOL FSEnumFile(_In_ std::_tstring lpExistDirPath, _In_ FS_PATH_CALLBACK cbFunc, _In_opt_ LPVOID lpParam);
+// List all subdirectories under the directory
+BOOL FSEnumAllDir(_In_ std::_tstring lpExistDirPath, _In_ FS_PATH_CALLBACK cbFunc, _In_opt_ LPVOID lpParam);
+// List all subfiles in the directory
+BOOL FSEnumAllFile(_In_ std::_tstring lpExistDirPath, _In_ FS_PATH_CALLBACK cbFunc, _In_opt_ LPVOID lpParam);
 
 #endif
 
