@@ -144,7 +144,7 @@ std::_tstring FSFormat(_In_ std::_tstring lpFormat, _In_ std::_tstring lpFullPat
 			break;
 		}
 		case 'z': case 'Z': {
-			Res += std::to_string(FBLIntToUl(FBGetFileSize(Path.c_str())));
+			Res += std::to_tstring(FBLIntToUl(FBGetFileSize(Path.c_str())));
 			break;
 		}
 		default: Res += op[Pt];
@@ -200,9 +200,9 @@ BOOL FSDeleteDir(_In_ std::_tstring lpExistFullPath) {
 	HANDLE hFind = FindFirstFile(EnumPath.c_str(), &findData);
 	if (hFind == INVALID_HANDLE_VALUE) return FALSE;
 	do {
-		std::_tstring NowPath = lpExistFullPath + TEXT(TEXT("\\")) + findData.cFileName;
+		std::_tstring NowPath = lpExistFullPath + TEXT("\\") + findData.cFileName;
 		if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-			if (_tcscmp(findData.cFileName, TEXT(TEXT("."))) == 0 || _tcscmp(findData.cFileName, TEXT(TEXT(".."))) == 0) continue;
+			if (_tcscmp(findData.cFileName, TEXT(".")) == 0 || _tcscmp(findData.cFileName, TEXT("..")) == 0) continue;
 			FSDeleteDir(NowPath.c_str());
 		}
 		else {
@@ -223,10 +223,10 @@ BOOL FSMoveDir(_In_ std::_tstring lpExistFullPath, _In_ std::_tstring lpNewFullP
 		if (!FSCreateDir(lpNewFullPath)) return FALSE;
 	}
 	do {
-		std::_tstring NowPath = lpExistFullPath + TEXT(TEXT("\\")) + findData.cFileName;
-		std::_tstring NewPath = lpNewFullPath + TEXT(TEXT("\\")) + findData.cFileName;
+		std::_tstring NowPath = lpExistFullPath + TEXT("\\") + findData.cFileName;
+		std::_tstring NewPath = lpNewFullPath + TEXT("\\") + findData.cFileName;
 		if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-			if (_tcscmp(findData.cFileName, TEXT(TEXT("."))) == 0 || _tcscmp(findData.cFileName, TEXT(TEXT(".."))) == 0) continue;
+			if (_tcscmp(findData.cFileName, TEXT(".")) == 0 || _tcscmp(findData.cFileName, TEXT("..")) == 0) continue;
 			FSMoveDir(NowPath.c_str(), NewPath.c_str(), bFailIfExists);
 		}
 		else {
@@ -256,10 +256,10 @@ BOOL FSCopyDir(_In_ std::_tstring lpExistFullPath, _In_ std::_tstring lpNewFullP
 		if (!FSCreateDir(lpNewFullPath)) return FALSE;
 	}
 	do {
-		std::_tstring NowPath = lpExistFullPath + TEXT(TEXT("\\")) + findData.cFileName;
-		std::_tstring NewPath = lpNewFullPath + TEXT(TEXT("\\")) + findData.cFileName;
+		std::_tstring NowPath = lpExistFullPath + TEXT("\\") + findData.cFileName;
+		std::_tstring NewPath = lpNewFullPath + TEXT("\\") + findData.cFileName;
 		if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-			if (_tcscmp(findData.cFileName, TEXT(TEXT("."))) == 0 || _tcscmp(findData.cFileName, TEXT(TEXT(".."))) == 0) continue;
+			if (_tcscmp(findData.cFileName, TEXT(".")) == 0 || _tcscmp(findData.cFileName, TEXT("..")) == 0) continue;
 			FSCopyDir(NowPath.c_str(), NewPath.c_str(), bFailIfExists);
 		}
 		else {
@@ -278,8 +278,8 @@ BOOL FSEnumDir(_In_ std::_tstring lpExistDirPath, _In_ FS_PATH_CALLBACK cbFunc, 
 	if (hFind == INVALID_HANDLE_VALUE) return FALSE;
 	do {
 		if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-			if (_tcscmp(findData.cFileName, TEXT(TEXT("."))) == 0 || _tcscmp(findData.cFileName, TEXT(TEXT(".."))) == 0) continue;
-			if (!cbFunc(std::_tstring(lpExistDirPath) + TEXT(TEXT("\\")) + findData.cFileName, lpParam)) break;
+			if (_tcscmp(findData.cFileName, TEXT(".")) == 0 || _tcscmp(findData.cFileName, TEXT("..")) == 0) continue;
+			if (!cbFunc(std::_tstring(lpExistDirPath) + TEXT("\\") + findData.cFileName, lpParam)) break;
 		}
 	} while (FindNextFile(hFind, &findData) != ERROR_SUCCESS);
 	FindClose(hFind);

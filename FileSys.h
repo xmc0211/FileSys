@@ -25,12 +25,14 @@
 
 #include <Windows.h>
 #include <string>
-#include "FileBinIO.h"
+#include "../FileBinIO/FileBinIO.h"
 
 #if defined(UNICODE)
 #define _tstring wstring
+#define to_tstring to_wstring
 #else
 #define _tstring string
+#define to_tstring to_string
 #endif
 
 // Enumeration of file operations
