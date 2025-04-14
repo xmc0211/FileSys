@@ -60,7 +60,7 @@ DWORD FSGetObjectAttribute(_In_ std::_tstring lpExistFullPath);
 // Set file or directory properties
 BOOL FSSetObjectAttribute(_In_ std::_tstring lpExistFullPath, _In_opt_ UINT uFileAttribute);
 // Perform operations on files. The available operations can refer to the comments within the enumeration.
-HANDLE FSOpenObject(_In_ std::_tstring lpExistFullPath, _In_opt_ FSFILEACTION fAction = FS_OPEN, _In_opt_ std::_tstring lpParameters = NULL, _In_opt_ BOOL bWaitForThread = TRUE, _In_opt_ UINT uShowFlags = SW_SHOWNORMAL);
+HANDLE FSOpenObject(_In_ std::_tstring lpExistFullPath, _In_opt_ FSFILEACTION fAction = FS_OPEN, _In_opt_ std::_tstring lpParameters = TEXT(""), _In_opt_ BOOL bWaitForThread = TRUE, _In_opt_ UINT uShowFlags = SW_SHOWNORMAL);
 // Determine whether the path is a file. If it does not exist, return False; if both exist, return bDefault.
 BOOL FSObjectIsFile(_In_ std::_tstring lpFullPath);
 
