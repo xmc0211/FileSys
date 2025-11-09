@@ -67,8 +67,20 @@ BOOL FSObjectIsFile(_In_ std::_tstring lpFullPath);
 // Get the current file name
 std::_tstring FSGetCurrentFilePath();
 
-// Format the complete path (lpFormat example: dpnx=>C:\Windows\System32\CMD.EXE nx=>CMD.EXE)
-std::_tstring FSFormat(_In_ std::_tstring lpFormat, _In_ std::_tstring lpFullPath);
+// Format the complete path (lpFormat example: FSF_DPNX=>C:\Windows\System32\CMD.EXE nx=>CMD.EXE)
+enum FSFormats {
+	FSF_D,
+	FSF_P,
+	FSF_N,
+	FSF_X,
+	FSF_Z, // size with string format
+	FSF_DP,
+	FSF_NX,
+	FSF_DPN,
+	FSF_PNX,
+	FSF_DPNX
+};
+std::_tstring FSFormat(_In_ FSFormats Format, _In_ std::_tstring lpFullPath);
 
 // Create an empty file
 BOOL FSCreateFile(_In_ std::_tstring lpFullPath);

@@ -94,10 +94,9 @@ std::_tstring FSGetCurrentFilePath() {
 }
 
 
-std::_tstring FSFormat(_In_ std::_tstring lpFormat, _In_ std::_tstring lpFullPath) {
-	std::_tstring op(lpFormat), Path(lpFullPath);
-	std::_tstring Res = TEXT("");
-	size_t fSize = op.size(), pSize = Path.size();
+std::_tstring FSFormat(_In_ FSFormats Format, _In_ std::_tstring lpFullPath) {
+	std::_tstring Path(lpFullPath);
+	size_t pSize = Path.size();
 
 	// Remove quotation marks
 	if (Path[0] == '\"' && Path[pSize - 1] == '\"') {
@@ -124,33 +123,20 @@ std::_tstring FSFormat(_In_ std::_tstring lpFormat, _In_ std::_tstring lpFullPat
 	std::_tstring ResName = Path.substr_p(PathPoint + 1, NamePoint - 1);
 	std::_tstring ResExt = Path.substr(NamePoint);
 
-	// Process and add each character individually
-	for (size_t Pt = 0; Pt < fSize; Pt++) {
-		switch (op[Pt]) {
-		case 'd': case 'D': {
-			Res += ResDrive;
-			break;
-		}
-		case 'p': case 'P': {
-			Res += ResPath;
-			break;
-		}
-		case 'n': case 'N': {
-			Res += ResName;
-			break;
-		}
-		case 'x': case 'X': {
-			Res += ResExt;
-			break;
-		}
-		case 'z': case 'Z': {
-			Res += std::to_tstring(FBLIntToUl(FBGetFileSize(Path.c_str())));
-			break;
-		}
-		default: Res += op[Pt];
-		}
+	// Process the format flag
+	switch (Format) {
+	case FSF_D: return ResDrive;
+	case FSF_P: return ResPath;
+	case FSF_N: return ResName;
+	case FSF_X: return ResExt;
+	case FSF_Z: return std::to_tstring(FBLIntToUl(FBGetFileSize(Path.c_str())));
+	case FSF_DP: return ResDrive + ResPath;
+	case FSF_NX: return ResName + ResExt;
+	case FSF_DPN: return ResDrive + ResPath + ResName;
+	case FSF_PNX: return ResPath + ResName + ResExt;
+	case FSF_DPNX: return ResDrive + ResPath + ResName + ResExt;
 	}
-	return Res;
+	return lpFullPath;
 }
 
 
@@ -177,8 +163,8 @@ BOOL FSMoveFile(_In_ std::_tstring lpExistFullPath, _In_ std::_tstring lpNewFull
 
 BOOL FSRenameFile(_In_ std::_tstring lpExistFullPath, _In_ std::_tstring lpNewFileName, _In_opt_ BOOL bFailIfExists) {
 	BOOL bRes = TRUE;
-	std::_tstring ExistPath = FSFormat(TEXT("dp"), lpExistFullPath);
-	if (ExistPath == TEXT("")) return FALSE;
+	std::_tstring ExistPath = FSFormat(FSF_DP, lpExistFullPath);
+	if (ExistPath.empty()) return FALSE;
 	bRes = FSMoveFile(lpExistFullPath, (ExistPath + lpNewFileName).c_str(), bFailIfExists);
 	return bRes;
 }
